@@ -1,0 +1,13 @@
+.color-box{
+    box-sizing: border-box;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px dotted black;
+}
+.active-color{
+    border: 2px solid black;
+}
+.color-box-container{
+    display: flex;
+}
