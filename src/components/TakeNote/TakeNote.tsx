@@ -1,6 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
-import React, { useReducer, useRef, useState } from 'react';
+import React, { useEffect, useReducer, useRef, useState } from 'react';
 import './takeNote.css'
 
 const TakeNote = () => {
@@ -17,35 +17,55 @@ const TakeNote = () => {
     const titleRef = useRef<HTMLInputElement>(null);
     const noteRef = useRef<HTMLInputElement>(null);
 
+    type actionType = { type:'ADD', payload: INote} | { type:'REMOVE', id: number} | {type:'LSNOTES', payload: INote[]};
+
+    const reducer = (state: INote[], action: actionType ) =>{
+        switch(action.type){
+            case 'ADD':
+                    return [
+                        ...state ,
+                        {...action.payload}
+                    ];
+            case 'REMOVE':
+                return state;
+            case 'LSNOTES':
+                return action.payload;
+        }
+    }
+    const [notes, dispatch] = useReducer(reducer, [])
+
     const handleOnSave = () =>{
         if(titleRef.current && noteRef.current){
             const newNote: INote = {
                 title: titleRef.current.value,
                 note: noteRef.current.value,
                 date: date,
-                bgColor: color
+                bgColor: color,
+                id: notes.length
             }
             dispatch({type:'ADD', payload:newNote})
+            setNoteToLocalS([...notes, newNote])
             titleRef.current.value = '';
             noteRef.current.value = '';
             setOpen(false);
         }
     }
-    type actionType = { type:'ADD', payload: INote} | { type:'REMOVE', id: number};
-
-    const reducer = (state: INote[], action: actionType ) =>{
-        switch(action.type){
-            case 'ADD':
-                return [
-                    ...state ,
-                    {...action.payload, id:state.length}
-                ];
-            case 'REMOVE':
-                return state;
+    // set note to local storage
+    const setNoteToLocalS =(note: INote[])=>{
+        localStorage.setItem('notes',JSON.stringify(note))
+    }
+    // get notes from local storage
+    const getNotesFromLocalS = () =>{
+        const notesJson = localStorage.getItem('notes')
+        if(notesJson){
+            const notesArray = JSON.parse(notesJson)
+            dispatch({type:'LSNOTES', payload: notesArray})
         }
     }
-    const [notes, dispatch] = useReducer(reducer, [])
-
+    useEffect( ()=>{
+        getNotesFromLocalS()
+    },[])
+    
     const handleClickOpen = () => {
       setOpen(true);
     };
@@ -108,7 +128,7 @@ const TakeNote = () => {
                 
             </Dialog>
             {
-                notes.map( N =><li>{N.title}</li>)
+                notes.map( note =><li>{note.title}</li>)
             }
         </div>
     );
