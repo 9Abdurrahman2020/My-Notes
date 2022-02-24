@@ -1,7 +1,8 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
+import { Button, Container, Dialog, DialogActions, DialogContent, DialogTitle, Grid, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { useEffect, useReducer, useRef, useState } from 'react';
-import './takeNote.css'
+import './takeNote.css';
+import Note from '../TakeNote/Note/Note'
 
 const TakeNote = () => {
     interface INote {
@@ -127,9 +128,13 @@ const TakeNote = () => {
                 </div>
                 
             </Dialog>
-            {
-                notes.map( note =><li>{note.title}</li>)
-            }
+            <Container sx={{mt:2}}>
+                <Grid container spacing={2}>
+                    {
+                        notes.reverse().map( note =><Note key={note.id} data={note} />)
+                    }
+                </Grid>
+            </Container>
         </div>
     );
 };
