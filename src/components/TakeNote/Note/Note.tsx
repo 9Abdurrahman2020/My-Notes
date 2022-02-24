@@ -49,6 +49,12 @@ const Note = ({data, onClick}:{ data: {
             setOpen(false);
         }
     }
+    const handleDelete=()=>{
+        const _delete = window.confirm('Are you sure want to delete ?')
+        if(_delete){
+            onClick({type:'REMOVE', id: data.id})
+        }
+    }
     return (
             <div>
                 <Dialog open={open} onClose={handleClose} >
@@ -110,7 +116,7 @@ const Note = ({data, onClick}:{ data: {
                     <b>{data.note}</b>
                     <div style={{display:'flex', justifyContent:'flex-end'}}>
                         <Button onClick={handleClickOpen}>Edit</Button>
-                        <Button onClick={ ()=> onClick({type:'REMOVE', id: data.id})}>Delete</Button>
+                        <Button onClick={ handleDelete }>Delete</Button>
                     </div>
                 </Paper>
             </div>
