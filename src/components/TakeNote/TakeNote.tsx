@@ -11,15 +11,16 @@ const TakeNote = () => {
         note: string,
         date: string,
         bgColor: string,
-        id: number
+        id: string
     }
-    const date = new Date().toLocaleDateString()
+    const date = new Date().toLocaleDateString();
+    const time = new Date().toLocaleTimeString();
     const [open, setOpen] = useState(false);
     const [ color, setColor ] = useState<string>('white');
     const titleRef = useRef<HTMLInputElement>(null);
     const noteRef = useRef<HTMLInputElement>(null);
 
-    type actionType = { type:'ADD', payload: INote} | { type:'REMOVE', id: number} | {type:'LSNOTES', payload: INote[]};
+    type actionType = { type:'ADD', payload: INote} | { type:'REMOVE', id: string} | {type:'LSNOTES', payload: INote[]} | { type: 'EDIT', id:string, payload: INote};
 
     // set note to local storage
     const setNoteToLocalS =(note: INote[])=>{
@@ -39,18 +40,24 @@ const TakeNote = () => {
                 return restNotes;
             case 'LSNOTES':
                 return action.payload;
+            case 'EDIT':
+                const rest = state.filter( n => n.id !== action.id);
+                const editedNotes = [...rest, action.payload]
+                setNoteToLocalS(editedNotes)
+                return editedNotes;
         }
     }
     const [notes, dispatch] = useReducer(reducer, [])
 
     const handleOnSave = () =>{
         if(titleRef.current && noteRef.current){
+            const noteId = `${notes.length}+${time}`
             const newNote: INote = {
                 title: titleRef.current.value,
                 note: noteRef.current.value,
                 date: date,
                 bgColor: color,
-                id: notes.length
+                id: noteId
             }
             dispatch({type:'ADD', payload:newNote})
             setNoteToLocalS([...notes, newNote])
