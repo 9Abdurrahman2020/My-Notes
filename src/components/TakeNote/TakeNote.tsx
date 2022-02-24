@@ -3,6 +3,7 @@ import { Box } from '@mui/system';
 import React, { useEffect, useReducer, useRef, useState } from 'react';
 import './takeNote.css';
 import Note from '../TakeNote/Note/Note'
+import { Masonry } from '@mui/lab';
 
 const TakeNote = () => {
     interface INote {
@@ -10,7 +11,7 @@ const TakeNote = () => {
         note: string,
         date: string,
         bgColor: string,
-        id?: number
+        id: number
     }
     const date = new Date().toLocaleDateString()
     const [open, setOpen] = useState(false);
@@ -20,6 +21,11 @@ const TakeNote = () => {
 
     type actionType = { type:'ADD', payload: INote} | { type:'REMOVE', id: number} | {type:'LSNOTES', payload: INote[]};
 
+    // set note to local storage
+    const setNoteToLocalS =(note: INote[])=>{
+        localStorage.setItem('notes',JSON.stringify(note))
+    }
+
     const reducer = (state: INote[], action: actionType ) =>{
         switch(action.type){
             case 'ADD':
@@ -28,7 +34,9 @@ const TakeNote = () => {
                         {...action.payload}
                     ];
             case 'REMOVE':
-                return state;
+                const restNotes = state.filter( n => n.id !== action.id);
+                setNoteToLocalS(restNotes)
+                return restNotes;
             case 'LSNOTES':
                 return action.payload;
         }
@@ -51,16 +59,13 @@ const TakeNote = () => {
             setOpen(false);
         }
     }
-    // set note to local storage
-    const setNoteToLocalS =(note: INote[])=>{
-        localStorage.setItem('notes',JSON.stringify(note))
-    }
+    
     // get notes from local storage
     const getNotesFromLocalS = () =>{
         const notesJson = localStorage.getItem('notes')
         if(notesJson){
             const notesArray = JSON.parse(notesJson)
-            dispatch({type:'LSNOTES', payload: notesArray})
+            dispatch({type:'LSNOTES', payload: notesArray.reverse()})
         }
     }
     useEffect( ()=>{
@@ -129,11 +134,11 @@ const TakeNote = () => {
                 
             </Dialog>
             <Container sx={{mt:2}}>
-                <Grid container spacing={2}>
+                <Masonry columns={{ xs: 1, sm: 2,md: 3, lg:4 }} spacing={2}>
                     {
-                        notes.reverse().map( note =><Note key={note.id} data={note} />)
+                        notes.reverse().map( note =><Note key={note.id} data={note} onClick={dispatch} />)
                     }
-                </Grid>
+                </Masonry>
             </Container>
         </div>
     );

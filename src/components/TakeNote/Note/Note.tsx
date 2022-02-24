@@ -1,26 +1,28 @@
-import { Grid, Paper, Typography } from '@mui/material';
+import { Button, Paper, Typography } from '@mui/material';
 import React from 'react';
-// import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
-const Note = ({data}:{ data: {
+const Note = ({data, onClick}:{ data: {
     title: string,
     note: string,
     date: string,
     bgColor: string,
-    id?: number
-}}) => {
+    id: number
+}, onClick:any }) => {
 
     const color = data.bgColor === 'red' ? 'white' : 'black';
 
     return (
-            <Grid item lg={3} md={4} sm={6} xs={12}>
-                <Paper elevation={3} style={{backgroundColor:data.bgColor,color:color,padding:'10px'}}> 
+            <div>
+                <Paper elevation={3} style={{backgroundColor:data.bgColor,color:color,padding:'15px'}}> 
                     <Typography>{data.date}</Typography>
-                    <Typography variant='h5'>{data.title}</Typography>
+                    <Typography sx={{mb:1}} variant='h5'>{data.title}</Typography>
                     <b>{data.note}</b>
-
+                    <div style={{display:'flex', justifyContent:'flex-end'}}>
+                        <Button>Edit</Button>
+                        <Button onClick={ ()=> onClick({type:'REMOVE', id: data.id})}>Delete</Button>
+                    </div>
                 </Paper>
-            </Grid>
+            </div>
     );
 };
 
